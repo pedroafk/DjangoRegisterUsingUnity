@@ -6,38 +6,34 @@ using UnityEngine.Networking;
 using System.Threading.Tasks;
 using System;
 
-//Script para avançar nos inputs de login usando tab e voltar usando shift tab e Método Get e Post via Rest Framework
+//Script para avançar nos inputs de login usando tab e voltar usando shift tab
 public class ChangeInput : MonoBehaviour
 {
     EventSystem system;
     public Selectable firstInput;
+    //Gerenciamento de input para tela de login
 
-    public InputField username;
+    public InputField username, first_name, last_name, email;
 
-    public InputField score;
-
-    [Serializable]
-    public class Gamer
-    {
-        public string username;
-        public int score;
+    public class RegisterUser{
+        public string username, first_name, last_name, email; 
     }
 
-    public void PostData()
-    {
-        string userNameFromInput = username.text;
-        int scoreFromInput = Int32.Parse(score.text);
+    public void PostRegister(){
+        string usernameFromInput = username.text;
+        string myNameFromInput = first_name.text;
+        string lNameFromInput = last_name.text;
+        string emailFromInput = email.text;
 
-        Gamer gamer = new Gamer();
-        gamer.username = userNameFromInput;
-        gamer.score = scoreFromInput;
-
-        string json = JsonUtility.ToJson(gamer);
-        //Debug.Log(json);
-        StartCoroutine(PostRequest(url, json));
-        //StartCoroutine(PostDjangoWebRequest());
+        RegisterUser registerUser = new RegisterUser();
+        registerUser.username = usernameFromInput;
+        registerUser.first_name = myNameFromInput;
+        registerUser.last_name = lNameFromInput;
+        registerUser.email = emailFromInput;
+        string json = JsonUtility.ToJson(registerUser);
+        Debug.Log($"registerJson: {json}");
+        StartCoroutine(PostRequest("",json));
     }
-
 
     //Método global para Post
     IEnumerator PostRequest(string url, string json)
@@ -61,10 +57,10 @@ public class ChangeInput : MonoBehaviour
         }
     }
 
-    //Metodo para Get
-    [ContextMenu("GetJson")]
-    public async void getJsonFromSite() {
-        var url = "url";
+    //Método para get do django
+    [ContextMenu("")]
+    public async void getJsonFromDjango() {
+        var url = "";
         using var www = UnityWebRequest.Get(url);
         www.SetRequestHeader("Content-Type", "application/json");
         var operation = www.SendWebRequest();
@@ -78,14 +74,14 @@ public class ChangeInput : MonoBehaviour
             Debug.Log($"Failed: {www.error}");
     }
 
-    // Start is called before the first frame update
+    // Seleciona primeiro elemento para poder avançar usando tab
     void Start()
     {
         system = EventSystem.current;
         firstInput.Select();
     }
 
-    // Update is called once per frame
+    // Update da sequência de campos usando tab
     void Update()
     {
         if(Input.GetKeyDown(KeyCode.Tab) && Input.GetKey(KeyCode.LeftShift)){
